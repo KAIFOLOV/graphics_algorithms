@@ -72,6 +72,7 @@ MainWindow::MainWindow()
         "Print Number",
         MethodNodeFactoryHybrid<decltype(&IVna::printNumber)>::make(&IVna::printNumber)
         );
+    node->params()["arg0"] = 25;
     auto* ni = new NodeItem(node);
     m_view->scene()->addItem(ni);
     ni->setPos(50, 150);
@@ -79,6 +80,7 @@ MainWindow::MainWindow()
     auto connection = new ConnectionItem(niGet->dataOutputs()[0], ni->dataInputs()[0]);
     ni->addConnection(connection);
     niGet->addConnection(connection);
+    m_view->scene()->addItem(connection);
 
     NodeContext ctx;
     ctx.set(m_vna);
@@ -91,6 +93,7 @@ MainWindow::MainWindow()
     QVector<QVariant> outputs2;
     node->execute(outputs, ctx, error, outputs2);
     qInfo() << "outputs" << outputs2;
+
 }
 
 void MainWindow::addNode(QListWidgetItem* item)
