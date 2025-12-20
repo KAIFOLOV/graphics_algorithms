@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include "../IVna.h"
 
 class QListWidget;
 class WorkflowView;
@@ -33,7 +34,7 @@ private:
     QWidget*          m_viewContainer = nullptr;
 
     // Прибор
-    FakeVna*          m_vna = nullptr;
+    IVna*          m_vna = nullptr;
 };
 
 #endif // MAINWINDOW_H

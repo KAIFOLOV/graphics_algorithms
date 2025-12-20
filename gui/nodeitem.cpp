@@ -21,7 +21,7 @@ NodeItem::NodeItem(Node* node)
     m_controlOutput->setPos(140, 10);
 
     // Входные порты данных
-    int dataInCount = node->params().value("dataPortInCount", 0).toInt();
+    int dataInCount = 1 /*node->params().value("dataPortInCount", 0).toInt()*/;
     for (int i = 0; i < dataInCount; ++i) {
         auto inPort = new PortItem(PortItem::Direction::Input, this);
         inPort->setPos(0, 40 + i*20);
@@ -29,7 +29,7 @@ NodeItem::NodeItem(Node* node)
     }
 
     // Выходные порты данных
-    int dataOutCount = node->params().value("dataPortOutCount", 0).toInt();
+    int dataOutCount = 1 /*node->params().value("dataPortOutCount", 0).toInt()*/;
     for (int i = 0; i < dataOutCount; ++i) {
         auto outPort = new PortItem(PortItem::Direction::Output, this);
         outPort->setPos(140, 40 + i*20);

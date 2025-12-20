@@ -9,69 +9,58 @@ void registerVnaNodes()
 {
     auto& f = NodeFactory::instance();
 
-    f.registerNode("VNA Connect", [] {
-        return new Node("VNA Connect",
-                        [](const QVariantMap&, const QVector<QVariant>&, NodeContext& ctx, QString&, QVector<QVariant>&) -> bool {
-                            return ctx.vna->connect();
-                        });
+    // Подключение
+    f.registerNode("VNA Connect", []() -> Node* {
+        return new Node(
+            "VNA Connect",
+            MethodNodeFactoryHybrid<decltype(&IVna::connect)>::make(&IVna::connect)
+            );
     });
 
-    f.registerNode("Set Start Frequency", [] {
-        auto* n = new Node("Set Start Frequency",
-                           [](const QVariantMap& p, const QVector<QVariant>&, NodeContext& ctx, QString&, QVector<QVariant>&) -> bool {
-                               return ctx.vna->setStartFrequency(p["freq"].toDouble());
-                           });
-        n->params()["freq"] = 1e9;
+    // Установка стартовой частоты
+    f.registerNode("Set Start Frequency", []() -> Node* {
+        auto* n = new Node(
+            "Set Start Frequency",
+            MethodNodeFactoryHybrid<decltype(&IVna::setStartFrequency)>::make(&IVna::setStartFrequency)
+            );
+        n->params()["arg0"] = 1e9; // GUI параметр по умолчанию
         return n;
     });
 
-    f.registerNode("Set Stop Frequency", [] {
-        auto* n = new Node("Set Stop Frequency",
-                           [](const QVariantMap& p, const QVector<QVariant>&, NodeContext& ctx, QString&, QVector<QVariant>&) -> bool {
-                               return ctx.vna->setStopFrequency(p["freq"].toDouble());
-                           });
-        n->params()["freq"] = 10e9;
+    // Установка стоповой частоты
+    f.registerNode("Set Stop Frequency", []() -> Node* {
+        auto* n = new Node(
+            "Set Stop Frequency",
+            MethodNodeFactoryHybrid<decltype(&IVna::setStopFrequency)>::make(&IVna::setStopFrequency)
+            );
+        n->params()["arg0"] = 10e9;
         return n;
     });
 
-    f.registerNode("Set Points", [] {
-        auto* n = new Node("Set Points",
-                           [](const QVariantMap& p, const QVector<QVariant>&, NodeContext& ctx, QString&, QVector<QVariant>&) -> bool {
-                               return ctx.vna->setPoints(p["pts"].toInt());
-                           });
-        n->params()["pts"] = 201;
+    // Количество точек
+    f.registerNode("Set Points", []() -> Node* {
+        auto* n = new Node(
+            "Set Points",
+            MethodNodeFactoryHybrid<decltype(&IVna::setPoints)>::make(&IVna::setPoints)
+            );
+        n->params()["arg0"] = 201;
         return n;
     });
 
-    f.registerNode("Get number", [] {
-        auto* n = new Node("Get number",
-                           [](const QVariantMap&, const QVector<QVariant>&, NodeContext& ctx, QString&, QVector<QVariant>& outputs) -> bool {
-                               int number = ctx.vna->getNumber();
-                               outputs = { number }; // кладём в выходной порт
-                               return true;
-                           });
-        n->params()["dataPortCount"] = 1;
-        return n;
+    // Получение числа
+    f.registerNode("Get Number", []() -> Node* {
+        return new Node(
+            "Get Number",
+            MethodNodeFactoryHybrid<decltype(&IVna::getNumber)>::make(&IVna::getNumber)
+            );
     });
 
-    f.registerNode("Print number", [] {
-        auto* n = new Node("Print number",
-                           [](const QVariantMap& p,
-                              const QVector<QVariant>& inputs,
-                              NodeContext& ctx,
-                              QString&,
-                              QVector<QVariant>& outputs) -> bool
-                           {
-                               if (inputs.isEmpty()) return false;
-
-                               int number = inputs[0].toInt();
-                               ctx.vna->printNumber(number);
-
-                               outputs = inputs; // если нужно передать дальше
-                               return true;
-                           });
-
-        n->params()["dataPortCount"] = 1; // один вход и один выход данных
+    // Печать числа
+    f.registerNode("Print Number", []() -> Node* {
+        auto* n = new Node(
+            "Print Number",
+            MethodNodeFactoryHybrid<decltype(&IVna::printNumber)>::make(&IVna::printNumber)
+            );
         return n;
     });
 }

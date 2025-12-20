@@ -9,10 +9,11 @@ public:
     virtual ~IVna() = default;
 
     virtual bool connect() = 0;
-    virtual bool setStartFrequency(double hz) = 0;
-    virtual bool setStopFrequency(double hz) = 0;
-    virtual bool setPoints(int pts) = 0;
+    virtual void setStartFrequency(double hz) = 0;
+    virtual void setStopFrequency(double hz) = 0;
+    virtual void setPoints(int pts) = 0;
     virtual int getNumber() = 0;
+    virtual bool isPower() = 0;
     virtual void printNumber(int number) = 0;
 };
 
@@ -23,26 +24,26 @@ public:
         qInfo() << "connect";
         return true;
     }
-    bool setStartFrequency(double hz) override {
+    void setStartFrequency(double hz) override {
         qInfo() << "setStartFrequency" << hz;
-        return true;
     }
-    bool setStopFrequency(double hz) override {
+    void setStopFrequency(double hz) override {
         qInfo() << "setStopFrequency" << hz;
-        return true;
     }
-    bool setPoints(int pts) override {
+    void setPoints(int pts) override {
         qInfo() << "setPoints" << pts;
-        return true;
     }
     int getNumber() override {
         qInfo() << "getNumber";
         return 8;
     }
+    bool isPower() override {
+        qInfo() << "isPower";
+        return true;
+    }
     void printNumber(int number) override {
         qInfo() << "printNumber" << number;
     }
-
 };
 
 #endif // IVNA_H

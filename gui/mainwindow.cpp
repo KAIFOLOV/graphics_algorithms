@@ -5,6 +5,7 @@
 #include "../workflowexecutor.h"
 #include "../nodefactory.h"
 #include "../IVna.h"
+#include "connectionitem.h"
 
 #include <QSplitter>
 #include <QPushButton>
@@ -45,7 +46,7 @@ MainWindow::MainWindow()
 
     connect(runBtn, &QPushButton::clicked, this, [this]() {
         NodeContext ctx;
-        ctx.vna = m_vna;
+        ctx.set(m_vna);
 
         WorkflowExecutor exec;
         exec.run(m_view->scene(), ctx);
@@ -59,34 +60,37 @@ MainWindow::MainWindow()
     connect(m_view->scene(), &QGraphicsScene::selectionChanged,
             this, &MainWindow::selectionChanged);
 
-    Node* getNumber = new Node("Get number",
-                               [](const QVariantMap&, const QVector<QVariant>&, NodeContext& ctx, QString&, QVector<QVariant>& outputs) -> bool {
-                                   int number = ctx.vna->getNumber();
-                                   outputs = { number }; // кладём в выходной порт
-                                   return true;
-                               });
+    auto nodeGet = new Node(
+        "Get Number",
+        MethodNodeFactoryHybrid<decltype(&IVna::getNumber)>::make(&IVna::getNumber)
+        );
+    auto* niGet = new NodeItem(nodeGet);
+    m_view->scene()->addItem(niGet);
+    niGet->setPos(50, 50);
 
-    Node* printNumber = new Node("Print number",
-                                 [](const QVariantMap& p,
-                                    const QVector<QVariant>& inputs,
-                                    NodeContext& ctx,
-                                    QString&,
-                                    QVector<QVariant>& outputs) -> bool
-                                 {
-                                     if (inputs.isEmpty()) return false;
+    auto node = new Node(
+        "Print Number",
+        MethodNodeFactoryHybrid<decltype(&IVna::printNumber)>::make(&IVna::printNumber)
+        );
+    auto* ni = new NodeItem(node);
+    m_view->scene()->addItem(ni);
+    ni->setPos(50, 150);
 
-                                     int number = inputs[0].toInt();
-                                     ctx.vna->printNumber(number);
+    auto connection = new ConnectionItem(niGet->dataOutputs()[0], ni->dataInputs()[0]);
+    ni->addConnection(connection);
+    niGet->addConnection(connection);
 
-                                     outputs = inputs; // если нужно передать дальше
-                                     return true;
-                                 });
+    NodeContext ctx;
+    ctx.set(m_vna);
 
-    // создаем NodeItem
-    NodeItem* ni1 = new NodeItem(getNumber);
-    NodeItem* ni2 = new NodeItem(printNumber);
-    m_view->scene()->addItem(ni1);
-    m_view->scene()->addItem(ni2);
+    QString error;
+    QVector<QVariant> outputs;
+    nodeGet->execute({}, ctx, error, outputs);
+    qInfo() << "outputs" << outputs;
+
+    QVector<QVariant> outputs2;
+    node->execute(outputs, ctx, error, outputs2);
+    qInfo() << "outputs" << outputs2;
 }
 
 void MainWindow::addNode(QListWidgetItem* item)
