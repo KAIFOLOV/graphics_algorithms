@@ -17,22 +17,39 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 
-    PortItem* inputPort() const { return m_input; }
-    PortItem* outputPort() const { return m_output; }
+    // Управление
+    PortItem* controlInput() const { return m_controlInput; }
+    PortItem* controlOutput() const { return m_controlOutput; }
+
+    // Данные
+    const QVector<PortItem*>& dataInputs() const { return m_dataInputs; }
+    const QVector<PortItem*>& dataOutputs() const { return m_dataOutputs; }
 
     Node* node() const;
 
     void addConnection(ConnectionItem* conn) { m_connections.append(conn); }
     const QVector<ConnectionItem*>& connections() const { return m_connections; }
 
+    // собрать данные с входных портов
+    QVector<QVariant> collectInputData() const;
+
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
     Node* m_node = nullptr;
-    PortItem* m_input = nullptr;
-    PortItem* m_output = nullptr;
-    QVector<ConnectionItem*> m_connections; // все соединения этой ноды
+
+    // Управляющие порты
+    PortItem* m_controlInput = nullptr;
+    PortItem* m_controlOutput = nullptr;
+
+    // Порты данных
+    QVector<PortItem*> m_dataInputs;
+    QVector<PortItem*> m_dataOutputs;
+
+    QVector<ConnectionItem*> m_connections;
 };
 
 #endif // NODEITEM_H

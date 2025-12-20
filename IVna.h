@@ -12,6 +12,8 @@ public:
     virtual bool setStartFrequency(double hz) = 0;
     virtual bool setStopFrequency(double hz) = 0;
     virtual bool setPoints(int pts) = 0;
+    virtual int getNumber() = 0;
+    virtual void printNumber(int number) = 0;
 };
 
 class FakeVna : public IVna
@@ -33,6 +35,14 @@ public:
         qInfo() << "setPoints" << pts;
         return true;
     }
+    int getNumber() override {
+        qInfo() << "getNumber";
+        return 8;
+    }
+    void printNumber(int number) override {
+        qInfo() << "printNumber" << number;
+    }
+
 };
 
 #endif // IVNA_H

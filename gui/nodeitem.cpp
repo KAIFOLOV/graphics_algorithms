@@ -1,43 +1,56 @@
 #include "nodeitem.h"
-#include "../node.h"
 #include "connectionitem.h"
+#include "../node.h"
+#include "qgraphicsscene.h"
+#include "qgraphicssceneevent.h"
 #include <QPainter>
 
 NodeItem::NodeItem(Node* node)
-    : QGraphicsObject(nullptr)
-    , m_node(node)
+    : m_node(node)
 {
-    setFlags(ItemIsMovable | ItemIsSelectable);
+    // Флаги для перемещения
+    setFlags(QGraphicsItem::ItemIsMovable |
+             QGraphicsItem::ItemSendsGeometryChanges |
+             QGraphicsItem::ItemIsSelectable);
 
-    // создаем порты
-    m_input = new PortItem(PortItem::Type::Input, this);
-    m_output = new PortItem(PortItem::Type::Output, this);
+    // Управляющие порты
+    m_controlInput = new PortItem(PortItem::Direction::Input, this);
+    m_controlOutput = new PortItem(PortItem::Direction::Output, this);
 
-    // позиционируем порты по центру левой и правой стороны
-    m_input->setPos(0, boundingRect().height()/2);
-    m_output->setPos(boundingRect().width(), boundingRect().height()/2);
+    m_controlInput->setPos(0, 10);
+    m_controlOutput->setPos(140, 10);
+
+    // Входные порты данных
+    int dataInCount = node->params().value("dataPortInCount", 0).toInt();
+    for (int i = 0; i < dataInCount; ++i) {
+        auto inPort = new PortItem(PortItem::Direction::Input, this);
+        inPort->setPos(0, 40 + i*20);
+        m_dataInputs.append(inPort);
+    }
+
+    // Выходные порты данных
+    int dataOutCount = node->params().value("dataPortOutCount", 0).toInt();
+    for (int i = 0; i < dataOutCount; ++i) {
+        auto outPort = new PortItem(PortItem::Direction::Output, this);
+        outPort->setPos(140, 40 + i*20);
+        m_dataOutputs.append(outPort);
+    }
 }
 
 QRectF NodeItem::boundingRect() const
 {
-    return QRectF(0, 0, 180, 50);
+    int dataHeight = qMax(m_dataInputs.size(), m_dataOutputs.size()) * 20;
+    return QRectF(0, 0, 160, 40 + dataHeight);
 }
 
-void NodeItem::paint(QPainter* p,
-                     const QStyleOptionGraphicsItem*,
-                     QWidget*)
+void NodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-    p->setRenderHint(QPainter::Antialiasing);
+    painter->setBrush(Qt::lightGray);
+    painter->setPen(QPen(Qt::black, 1));
+    painter->drawRoundedRect(boundingRect(), 5, 5);
 
-    // фон
-    QColor bg = Qt::lightGray;
-    p->setBrush(bg);
-    p->setPen(QPen(Qt::black, 1));
-    p->drawRoundedRect(boundingRect(), 5, 5);
-
-    // текст
-    p->setPen(Qt::black);
-    p->drawText(boundingRect(), Qt::AlignCenter, m_node ? m_node->name() : "Node");
+    painter->setPen(Qt::black);
+    painter->drawText(boundingRect(), Qt::AlignCenter, m_node ? m_node->name() : "Node");
 }
 
 Node* NodeItem::node() const
@@ -45,11 +58,40 @@ Node* NodeItem::node() const
     return m_node;
 }
 
-void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+QVector<QVariant> NodeItem::collectInputData() const
+{
+    QVector<QVariant> inputs;
+    for (auto inPort : m_dataInputs) {
+        QVariant val;
+        for (auto conn : inPort->connections()) {
+            NodeItem* sourceNode = conn->sourcePort()->parentNodeItem();
+            int index = conn->sourcePort()->index(); // <-- здесь
+            if (sourceNode)
+                val = sourceNode->node()->lastOutput().value(index);
+        }
+        inputs.append(val);
+    }
+    return inputs;
+}
+
+void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseMoveEvent(event);
-
-    // обновляем все соединения, чтобы линии двигались за нодой
-    for (auto* conn : m_connections)
+    for (auto conn : m_connections)
         conn->updatePath();
+}
+
+void NodeItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    QGraphicsItem* clicked = scene()->itemAt(event->scenePos(), QTransform());
+    if (dynamic_cast<PortItem*>(clicked)) {
+        event->ignore();
+        return;
+    }
+    QGraphicsObject::mousePressEvent(event);
+}
+
+void NodeItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    QGraphicsObject::mouseReleaseEvent(event);
 }

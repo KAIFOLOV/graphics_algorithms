@@ -9,6 +9,9 @@ ConnectionItem::ConnectionItem(PortItem* from, PortItem* to)
     setPen(QPen(Qt::black, 2));
     setZValue(-1);
     updatePath();
+
+    from->addConnection(this);
+    to->addConnection(this);
 }
 
 void ConnectionItem::updatePath()

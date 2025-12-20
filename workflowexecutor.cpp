@@ -2,6 +2,7 @@
 #include "gui/connectionitem.h"
 
 #include <QQueue>
+#include <QDebug>
 
 void WorkflowExecutor::run(QGraphicsScene *scene, NodeContext &ctx)
 {
@@ -12,9 +13,15 @@ void WorkflowExecutor::run(QGraphicsScene *scene, NodeContext &ctx)
 
     QString err;
     for (auto* ni : nodes) {
-        if (!ni->node()->execute(ctx, err)) {
+        QVector<QVariant> inputs = ni->collectInputData(); // собираем данные с входных портов
+        QVector<QVariant> outputs;
+
+        if (!ni->node()->execute(inputs, ctx, err, outputs)) {
             qWarning() << "Error executing" << ni->node()->name() << ":" << err;
             break;
         }
+
+        // outputs автоматически сохраняются в Node::lastOutput
+        Q_UNUSED(outputs);
     }
 }

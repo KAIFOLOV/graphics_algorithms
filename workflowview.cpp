@@ -14,6 +14,6 @@ WorkflowView::WorkflowView(QWidget* parent)
 
 void WorkflowView::createConnection(NodeItem* from, NodeItem* to)
 {
-    auto* conn = new ConnectionItem(from->outputPort(), to->inputPort());
-    scene()->addItem(conn);
+    // auto* conn = new ConnectionItem(from->outputPort(), to->inputPort());
+    // scene()->addItem(conn);
 }

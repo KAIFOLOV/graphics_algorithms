@@ -58,6 +58,35 @@ MainWindow::MainWindow()
     // Подключаем отображение свойств при выборе ноды
     connect(m_view->scene(), &QGraphicsScene::selectionChanged,
             this, &MainWindow::selectionChanged);
+
+    Node* getNumber = new Node("Get number",
+                               [](const QVariantMap&, const QVector<QVariant>&, NodeContext& ctx, QString&, QVector<QVariant>& outputs) -> bool {
+                                   int number = ctx.vna->getNumber();
+                                   outputs = { number }; // кладём в выходной порт
+                                   return true;
+                               });
+
+    Node* printNumber = new Node("Print number",
+                                 [](const QVariantMap& p,
+                                    const QVector<QVariant>& inputs,
+                                    NodeContext& ctx,
+                                    QString&,
+                                    QVector<QVariant>& outputs) -> bool
+                                 {
+                                     if (inputs.isEmpty()) return false;
+
+                                     int number = inputs[0].toInt();
+                                     ctx.vna->printNumber(number);
+
+                                     outputs = inputs; // если нужно передать дальше
+                                     return true;
+                                 });
+
+    // создаем NodeItem
+    NodeItem* ni1 = new NodeItem(getNumber);
+    NodeItem* ni2 = new NodeItem(printNumber);
+    m_view->scene()->addItem(ni1);
+    m_view->scene()->addItem(ni2);
 }
 
 void MainWindow::addNode(QListWidgetItem* item)
