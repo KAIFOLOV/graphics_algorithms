@@ -19,4 +19,6 @@ private:
     PortItem* m_to;
 };
 
+
+
 #endif // CONNECTIONITEM_H

@@ -4,20 +4,23 @@
 #include <QGraphicsEllipseItem>
 #include <QVector>
 #include <QBrush>
+#include <QGraphicsSceneMouseEvent>
 
-class NodeItem;
 class ConnectionItem;
+class NodeItem;
 
 class PortItem : public QGraphicsEllipseItem
 {
 public:
     enum class Direction { Input, Output };
 
-    PortItem(Direction dir, QGraphicsItem* parent = nullptr)
-        : QGraphicsEllipseItem(parent), m_dir(dir), m_index(0)
+    PortItem(Direction dir, QGraphicsItem* parentNode)
+        : QGraphicsEllipseItem(parentNode), m_dir(dir), m_tempLine(nullptr)
     {
-        setRect(-5, -5, 10, 10);
+        setRect(-5,-5,10,10);
         setBrush(dir == Direction::Input ? Qt::blue : Qt::green);
+        setFlag(QGraphicsItem::ItemIsSelectable);
+        setAcceptHoverEvents(true);
     }
 
     Direction getDirection() const { return m_dir; }
@@ -26,17 +29,29 @@ public:
     void addConnection(ConnectionItem* conn) { m_connections.append(conn); }
     const QVector<ConnectionItem*>& connections() const { return m_connections; }
 
-    // возвращает NodeItem, которому принадлежит порт
-    NodeItem* parentNodeItem() const;
+    void setIndex(int index) {
+        _index = index;
+    }
 
-    // индекс порта в массиве входных/выходных портов ноды
-    void setIndex(int idx) { m_index = idx; }
-    int index() const { return m_index; }
+    NodeItem *parentNodeItem() const;
+
+    int index() const
+    {
+        return _index;
+    }
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
     Direction m_dir;
     QVector<ConnectionItem*> m_connections;
-    int m_index; // индекс порта в массиве NodeItem
+
+    QGraphicsLineItem* m_tempLine;
+
+    int _index;
 };
 
 #endif // PORTITEM_H
