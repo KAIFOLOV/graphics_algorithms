@@ -18,19 +18,19 @@ NodeItem::NodeItem(Node* node)
     m_controlOutput = new PortItem(PortItem::Direction::Output, PortItem::PortKind::Control, this);
 
     m_controlInput->setPos(0, 10);
-    m_controlOutput->setPos(140, 10);
+    m_controlOutput->setPos(160, 10);
 
-    for (int i = 0; i < 1; ++i) {
+    for (int i = 0; i < node->countInputsPorts(); ++i) {
         auto* p = new PortItem(PortItem::Direction::Input, PortItem::PortKind::Data, this);
         p->setIndex(i);
         p->setPos(0, 40 + i*20);
         m_dataInputs.append(p);
     }
 
-    for (int i = 0; i < 1; ++i) {
+    for (int i = 0; i < node->countOutputsPorts(); ++i) {
         auto* p = new PortItem(PortItem::Direction::Output, PortItem::PortKind::Data, this);
         p->setIndex(i);
-        p->setPos(140, 40 + i*20);
+        p->setPos(160, 40 + i*20);
         m_dataOutputs.append(p);
     }
 }

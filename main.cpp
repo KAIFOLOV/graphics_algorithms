@@ -49,19 +49,21 @@ void registerVnaNodes()
 
     // Получение числа
     f.registerNode("Get Number", []() -> Node* {
-        return new Node(
+        auto node = new Node(
             "Get Number",
             MethodNodeFactoryHybrid<decltype(&IVna::getNumber)>::make(&IVna::getNumber)
             );
+        node->setCountOutputsPorts(1);
     });
 
     // Печать числа
     f.registerNode("Print Number", []() -> Node* {
-        auto* n = new Node(
+        auto* node = new Node(
             "Print Number",
             MethodNodeFactoryHybrid<decltype(&IVna::printNumber)>::make(&IVna::printNumber)
             );
-        return n;
+        node->setCountInputsPorts(1);
+        return node;
     });
 }
 

@@ -61,7 +61,7 @@ public:
 
     QRectF boundingRect() const override
     {
-        return QRectF(0, 0, 120, 50);
+        return QRectF(0, 0, 160, 40);
     }
 
     void paint(QPainter* p, const QStyleOptionGraphicsItem*, QWidget*) override

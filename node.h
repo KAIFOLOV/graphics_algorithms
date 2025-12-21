@@ -46,9 +46,7 @@ public:
 
     explicit Node() = default;
 
-    explicit Node(const QString& name, Callback cb, QObject* parent = nullptr)
-        : QObject(parent), m_name(name), m_cb(cb)
-    {}
+    explicit Node(const QString& name, Callback cb, QObject* parent = nullptr);
 
     virtual QString name() const { return m_name; }
     QVariantMap& params() { return m_params; }
@@ -63,6 +61,12 @@ public:
 
     const QVector<QVariant>& lastOutput() const { return m_lastOutput; }
 
+    int countInputsPorts() const;
+    void setCountInputsPorts(int newCountInputsPorts);
+
+    int countOutputsPorts() const;
+    void setCountOutputsPorts(int newCountOutputsPorts);
+
 signals:
     void updated();
 
@@ -71,6 +75,9 @@ private:
     QVariantMap m_params;
     Callback m_cb;
     QVector<QVariant> m_lastOutput;
+
+    int _countInputsPorts { 0 };
+    int _countOutputsPorts { 0 };
 };
 
 class StartNode : public Node
