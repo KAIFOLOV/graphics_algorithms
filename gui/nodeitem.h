@@ -2,6 +2,7 @@
 #define NODEITEM_H
 
 #include "portitem.h"
+#include "qpainter.h"
 #include <QGraphicsObject>
 #include <QVector>
 
@@ -33,23 +34,43 @@ public:
     // собрать данные с входных портов
     QVector<QVariant> collectInputData() const;
 
+    void removeConnection(ConnectionItem *c);
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
-private:
-    Node* m_node = nullptr;
-
     // Управляющие порты
     PortItem* m_controlInput = nullptr;
     PortItem* m_controlOutput = nullptr;
+
+private:
+    Node* m_node = nullptr;
 
     // Порты данных
     QVector<PortItem*> m_dataInputs;
     QVector<PortItem*> m_dataOutputs;
 
     QVector<ConnectionItem*> m_connections;
+};
+
+class StartNodeItem : public NodeItem
+{
+public:
+    StartNodeItem();
+
+    QRectF boundingRect() const override
+    {
+        return QRectF(0, 0, 120, 50);
+    }
+
+    void paint(QPainter* p, const QStyleOptionGraphicsItem*, QWidget*) override
+    {
+        p->setBrush(QColor(120, 200, 120));
+        p->setPen(Qt::black);
+        p->drawRoundedRect(boundingRect(), 10, 10);
+        p->drawText(boundingRect(), Qt::AlignCenter, "START");
+    }
 };
 
 #endif // NODEITEM_H

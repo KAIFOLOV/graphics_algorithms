@@ -11,6 +11,8 @@ public:
 
     void updatePath();
 
+    void disconnect();
+
     PortItem* sourcePort() const { return m_from; }
     PortItem* targetPort() const { return m_to; }
 

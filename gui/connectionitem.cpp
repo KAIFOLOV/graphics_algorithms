@@ -1,5 +1,7 @@
 #include "connectionitem.h"
 #include "portitem.h"
+#include "qgraphicsscene.h"
+#include "nodeitem.h"
 
 #include <QPainter>
 
@@ -25,4 +27,27 @@ void ConnectionItem::updatePath()
     path.cubicTo(p1 + QPointF(dx, 0), p2 - QPointF(dx,0), p2);
 
     setPath(path);
+}
+
+void ConnectionItem::disconnect()
+{
+    if (m_from)
+        m_from->removeConnection(this);
+
+    if (m_to)
+        m_to->removeConnection(this);
+
+    if (auto* n = m_from ? m_from->parentNodeItem() : nullptr)
+        n->removeConnection(this);
+
+    if (auto* n = m_to ? m_to->parentNodeItem() : nullptr)
+        n->removeConnection(this);
+
+    m_from = nullptr;
+    m_to = nullptr;
+
+    if (scene())
+        scene()->removeItem(this);
+
+    delete this;
 }

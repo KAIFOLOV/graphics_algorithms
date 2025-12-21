@@ -59,41 +59,6 @@ MainWindow::MainWindow()
     // Подключаем отображение свойств при выборе ноды
     connect(m_view->scene(), &QGraphicsScene::selectionChanged,
             this, &MainWindow::selectionChanged);
-
-    // auto nodeGet = new Node(
-    //     "Get Number",
-    //     MethodNodeFactoryHybrid<decltype(&IVna::getNumber)>::make(&IVna::getNumber)
-    //     );
-    // auto* niGet = new NodeItem(nodeGet);
-    // m_view->scene()->addItem(niGet);
-    // niGet->setPos(50, 50);
-
-    // auto node = new Node(
-    //     "Print Number",
-    //     MethodNodeFactoryHybrid<decltype(&IVna::printNumber)>::make(&IVna::printNumber)
-    //     );
-    // node->params()["arg0"] = 25;
-    // auto* ni = new NodeItem(node);
-    // m_view->scene()->addItem(ni);
-    // ni->setPos(50, 150);
-
-    // auto connection = new ConnectionItem(niGet->dataOutputs()[0], ni->dataInputs()[0]);
-    // ni->addConnection(connection);
-    // niGet->addConnection(connection);
-    // m_view->scene()->addItem(connection);
-
-    // NodeContext ctx;
-    // ctx.set(m_vna);
-
-    // QString error;
-    // QVector<QVariant> outputs;
-    // nodeGet->execute({}, ctx, error, outputs);
-    // qInfo() << "outputs" << outputs;
-
-    // QVector<QVariant> outputs2;
-    // node->execute(outputs, ctx, error, outputs2);
-    // qInfo() << "outputs" << outputs2;
-
 }
 
 void MainWindow::addNode(QListWidgetItem* item)

@@ -1,6 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "qdebug.h"
 #include <QObject>
 #include <QVariant>
 #include <QVariantMap>
@@ -43,14 +44,16 @@ public:
         QVector<QVariant>& outputs
         )>;
 
+    explicit Node() = default;
+
     explicit Node(const QString& name, Callback cb, QObject* parent = nullptr)
         : QObject(parent), m_name(name), m_cb(cb)
     {}
 
-    QString name() const { return m_name; }
+    virtual QString name() const { return m_name; }
     QVariantMap& params() { return m_params; }
 
-    bool execute(const QVector<QVariant>& inputs, NodeContext& ctx, QString& error, QVector<QVariant>& outputs)
+    virtual bool execute(const QVector<QVariant>& inputs, NodeContext& ctx, QString& error, QVector<QVariant>& outputs)
     {
         bool ok = m_cb(m_params, inputs, ctx, error, outputs);
         if (ok)
@@ -68,6 +71,22 @@ private:
     QVariantMap m_params;
     Callback m_cb;
     QVector<QVariant> m_lastOutput;
+};
+
+class StartNode : public Node
+{
+public:
+    explicit StartNode() = default;
+    QString name() const override { return "Start"; }
+
+    bool execute(const QVector<QVariant>&,
+                 NodeContext&,
+                 QString&,
+                 QVector<QVariant>&) override
+    {
+        qInfo() << "start";
+        return true; // ничего не делает
+    }
 };
 
 // ===================== MethodNodeFactoryHybrid =====================

@@ -9,7 +9,12 @@ class WorkflowView : public QGraphicsView
     Q_OBJECT
 public:
     explicit WorkflowView(QWidget* parent = nullptr);
-    void createConnection(NodeItem *from, NodeItem *to);
+
+    StartNodeItem* startNode() const { return m_startNode; }
+
+private:
+    QGraphicsScene* m_scene;
+    StartNodeItem*  m_startNode = nullptr;
 };
 
 #endif // WORKFLOWVIEW_H

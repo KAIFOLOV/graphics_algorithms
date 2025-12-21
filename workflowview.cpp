@@ -8,12 +8,13 @@
 WorkflowView::WorkflowView(QWidget* parent)
     : QGraphicsView(parent)
 {
-    setScene(new QGraphicsScene(this));
-    setRenderHint(QPainter::Antialiasing);
-}
+    m_scene = new QGraphicsScene(this);
+    setScene(m_scene);
 
-void WorkflowView::createConnection(NodeItem* from, NodeItem* to)
-{
-    // auto* conn = new ConnectionItem(from->outputPort(), to->inputPort());
-    // scene()->addItem(conn);
+    // 🔴 СОЗДАЁМ START-АВТОМАТИЧЕСКИ
+    m_startNode = new StartNodeItem;
+    m_scene->addItem(m_startNode);
+    m_startNode->setPos(30, 100);
+
+    setRenderHint(QPainter::Antialiasing);
 }

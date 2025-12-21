@@ -4,24 +4,54 @@
 #include <QQueue>
 #include <QDebug>
 
-void WorkflowExecutor::run(QGraphicsScene *scene, NodeContext &ctx)
+static NodeItem* nextByControl(NodeItem* node)
 {
-    QList<NodeItem*> nodes;
-    for (auto* item : scene->items())
-        if (auto* ni = dynamic_cast<NodeItem*>(item))
-            nodes.append(ni);
+    auto* out = node->controlOutput();
+    if (!out || out->connections().isEmpty())
+        return nullptr;
 
-    QString err;
-    for (auto* ni : nodes) {
-        QVector<QVariant> inputs = ni->collectInputData(); // собираем данные с входных портов
-        QVector<QVariant> outputs;
+    auto* conn = out->connections().first();
+    return conn->targetPort()->parentNodeItem();
+}
 
-        if (!ni->node()->execute(inputs, ctx, err, outputs)) {
-            qWarning() << "Error executing" << ni->node()->name() << ":" << err;
+void WorkflowExecutor::run(QGraphicsScene* scene, NodeContext& ctx)
+{
+    StartNodeItem* start = nullptr;
+
+    for (auto* it : scene->items()) {
+        if (auto* s = dynamic_cast<StartNodeItem*>(it)) {
+            start = s;
             break;
         }
+    }
 
-        // outputs автоматически сохраняются в Node::lastOutput
-        Q_UNUSED(outputs);
+    if (!start) {
+        qWarning() << "No Start node";
+        return;
+    }
+
+    QSet<NodeItem*> visited;
+    NodeItem* current = start;
+
+    QString err;
+
+    while (current) {
+        if (visited.contains(current)) {
+            qWarning() << "Cycle detected";
+            break;
+        }
+        visited.insert(current);
+
+        QVector<QVariant> inputs = current->collectInputData();
+        QVector<QVariant> outputs;
+
+        if (current->node()) {
+            if (!current->node()->execute(inputs, ctx, err, outputs)) {
+                qWarning() << "Execution error:" << err;
+                break;
+            }
+        }
+
+        current = nextByControl(current);
     }
 }

@@ -14,21 +14,21 @@ NodeItem::NodeItem(Node* node)
              QGraphicsItem::ItemIsSelectable);
 
     // Управляющие порты
-    m_controlInput = new PortItem(PortItem::Direction::Input, this);
-    m_controlOutput = new PortItem(PortItem::Direction::Output, this);
+    m_controlInput = new PortItem(PortItem::Direction::Input, PortItem::PortKind::Control, this);
+    m_controlOutput = new PortItem(PortItem::Direction::Output, PortItem::PortKind::Control, this);
 
     m_controlInput->setPos(0, 10);
     m_controlOutput->setPos(140, 10);
 
     for (int i = 0; i < 1; ++i) {
-        auto* p = new PortItem(PortItem::Direction::Input, this);
+        auto* p = new PortItem(PortItem::Direction::Input, PortItem::PortKind::Data, this);
         p->setIndex(i);
         p->setPos(0, 40 + i*20);
         m_dataInputs.append(p);
     }
 
     for (int i = 0; i < 1; ++i) {
-        auto* p = new PortItem(PortItem::Direction::Output, this);
+        auto* p = new PortItem(PortItem::Direction::Output, PortItem::PortKind::Data, this);
         p->setIndex(i);
         p->setPos(140, 40 + i*20);
         m_dataOutputs.append(p);
@@ -105,4 +105,17 @@ void NodeItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 void NodeItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     QGraphicsObject::mouseReleaseEvent(event);
+}
+
+void NodeItem::removeConnection(ConnectionItem* c)
+{
+    m_connections.removeOne(c);
+}
+
+StartNodeItem::StartNodeItem()
+    : NodeItem(new StartNode)
+{
+    // ❌ нет входа управления
+    delete m_controlInput;
+    m_controlInput = nullptr;
 }
