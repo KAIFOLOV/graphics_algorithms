@@ -27,7 +27,7 @@ private slots:
 private:
     // UI элементы
     QListWidget*      m_palette = nullptr;
-    WorkflowView*     m_view = nullptr;
+    WorkflowView*     _view = nullptr;
     PropertiesWidget* m_props = nullptr;
 
     // Контейнер для canvas + кнопка Run

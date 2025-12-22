@@ -8,6 +8,11 @@
 WorkflowView::WorkflowView(QWidget* parent)
     : QGraphicsView(parent)
 {
+    qRegisterMetaType<Graph*>("Graph*");
+
+    _graph = new Graph();
+    // _graph->addNode(new StartNode());
+
     m_scene = new QGraphicsScene(this);
     setScene(m_scene);
 
@@ -17,4 +22,10 @@ WorkflowView::WorkflowView(QWidget* parent)
     m_startNode->setPos(30, 100);
 
     setRenderHint(QPainter::Antialiasing);
+    m_scene->setProperty("graph", QVariant::fromValue(_graph));
+}
+
+Graph *WorkflowView::graph() const
+{
+    return _graph;
 }

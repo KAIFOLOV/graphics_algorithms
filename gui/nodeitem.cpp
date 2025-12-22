@@ -20,17 +20,31 @@ NodeItem::NodeItem(Node* node)
     m_controlInput->setPos(0, 10);
     m_controlOutput->setPos(160, 10);
 
-    for (int i = 0; i < node->countInputsPorts(); ++i) {
-        auto* p = new PortItem(PortItem::Direction::Input, PortItem::PortKind::Data, this);
-        p->setIndex(i);
-        p->setPos(0, 40 + i*20);
+    // DATA INPUTS
+    const auto& inputs = node->inputs();
+    for (int i = 0; i < inputs.size(); ++i) {
+        auto* p = new PortItem(
+            PortItem::Direction::Input,
+            PortItem::PortKind::Data,
+            this
+            );
+
+        p->setPortId(inputs[i].id());
+        p->setPos(0, 40 + i * 20);
         m_dataInputs.append(p);
     }
 
-    for (int i = 0; i < node->countOutputsPorts(); ++i) {
-        auto* p = new PortItem(PortItem::Direction::Output, PortItem::PortKind::Data, this);
-        p->setIndex(i);
-        p->setPos(160, 40 + i*20);
+    // DATA OUTPUTS
+    const auto& outputs = node->outputs();
+    for (int i = 0; i < outputs.size(); ++i) {
+        auto* p = new PortItem(
+            PortItem::Direction::Output,
+            PortItem::PortKind::Data,
+            this
+            );
+
+        p->setPortId(outputs[i].id());
+        p->setPos(160, 40 + i * 20);
         m_dataOutputs.append(p);
     }
 }
@@ -56,35 +70,6 @@ Node* NodeItem::node() const
     return m_node;
 }
 
-QVector<QVariant> NodeItem::collectInputData() const
-{
-    QVector<QVariant> inputs;
-    inputs.reserve(m_dataInputs.size());
-
-    for (PortItem* inPort : m_dataInputs) {
-        QVariant value;
-
-        // Обычно вход может иметь только одно соединение
-        if (!inPort->connections().isEmpty()) {
-            auto* conn = inPort->connections().first();
-
-            PortItem* outPort = conn->sourcePort();
-            NodeItem* sourceNode = outPort->parentNodeItem();
-
-            if (sourceNode) {
-                int outIndex = outPort->index();
-                const auto& outValues = sourceNode->node()->lastOutput();
-
-                if (outIndex >= 0 && outIndex < outValues.size())
-                    value = outValues[outIndex];
-            }
-        }
-
-        inputs.append(value);
-    }
-
-    return inputs;
-}
 void NodeItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseMoveEvent(event);

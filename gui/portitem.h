@@ -6,6 +6,8 @@
 #include <QBrush>
 #include <QGraphicsSceneMouseEvent>
 
+#include "../NodePort.h"
+
 class ConnectionItem;
 class NodeItem;
 
@@ -32,16 +34,12 @@ public:
     void addConnection(ConnectionItem* conn);
     const QVector<ConnectionItem*>& connections() const { return m_connections; }
 
-    void setIndex(int index) {
-        _index = index;
-    }
+    void setPortId(const PortId& id) { m_portId = id; }
+    PortId portId() const { return m_portId; }
+
 
     NodeItem *parentNodeItem() const;
 
-    int index() const
-    {
-        return _index;
-    }
 
     bool canAcceptConnection() const;
     void removeConnection(ConnectionItem *c);
@@ -60,7 +58,7 @@ private:
 
     QGraphicsLineItem* m_tempLine;
 
-    int _index;
+    PortId m_portId;
 };
 
 #endif // PORTITEM_H

@@ -23,7 +23,7 @@ void PropertiesWidget::setNode(Node* node)
             auto* s = new QDoubleSpinBox;
             s->setValue(it.value().toDouble());
             connect(s, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                    node, [node, key = it.key()](double v) {
+                    this, [node, key = it.key()](double v) {
                         node->params()[key] = v;
                     });
             l->addRow(it.key(), s);
@@ -32,7 +32,7 @@ void PropertiesWidget::setNode(Node* node)
             auto* s = new QSpinBox;
             s->setValue(it.value().toInt());
             connect(s, QOverload<int>::of(&QSpinBox::valueChanged),
-                    node, [node, key = it.key()](int v) {
+                    this, [node, key = it.key()](int v) {
                         node->params()[key] = v;
                     });
             l->addRow(it.key(), s);

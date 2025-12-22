@@ -1,15 +1,12 @@
 #ifndef WORKFLOWEXECUTOR_H
 #define WORKFLOWEXECUTOR_H
 
-#include "gui/nodeitem.h"
-#include "node.h"
-#include "qdebug.h"
-#include "qgraphicsscene.h"
+#include "Graph.h"
 
 class WorkflowExecutor
 {
 public:
-    void run(QGraphicsScene* scene, NodeContext& ctx);
+    void run(Graph& graph, NodeContext& ctx);
 };
 
 #endif // WORKFLOWEXECUTOR_H

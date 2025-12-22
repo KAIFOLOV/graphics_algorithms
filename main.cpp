@@ -53,7 +53,8 @@ void registerVnaNodes()
             "Get Number",
             MethodNodeFactoryHybrid<decltype(&IVna::getNumber)>::make(&IVna::getNumber)
             );
-        node->setCountOutputsPorts(1);
+        node->setOutputs({NodePort("Number")});
+        return node;
     });
 
     // Печать числа
@@ -62,7 +63,7 @@ void registerVnaNodes()
             "Print Number",
             MethodNodeFactoryHybrid<decltype(&IVna::printNumber)>::make(&IVna::printNumber)
             );
-        node->setCountInputsPorts(1);
+        node->setInputs({NodePort("Number")});
         return node;
     });
 }

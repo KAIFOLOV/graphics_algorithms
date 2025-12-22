@@ -7,92 +7,77 @@
 #include <QVariantMap>
 #include <QVector>
 #include <functional>
-#include <typeindex>
-#include <unordered_map>
 #include <type_traits>
+
+#include "NodeContext.h"
+#include "NodePort.h"
 
 class IVna;
 
-class NodeContext
+class Node
 {
-public:
-    template<typename T>
-    void set(T* device) { devices[typeid(T)] = device; }
-
-    template<typename T>
-    T* get() const
-    {
-        auto it = devices.find(typeid(T));
-        if (it == devices.end())
-            return nullptr;
-        return static_cast<T*>(it->second);
-    }
-
-private:
-    std::unordered_map<std::type_index, void*> devices;
-};
-
-class Node : public QObject
-{
-    Q_OBJECT
 public:
     using Callback = std::function<bool(
         const QVariantMap& params,
-        const QVector<QVariant>& inputs,
+        const QHash<PortId, QVariant>& inputs,
         NodeContext& ctx,
         QString& error,
-        QVector<QVariant>& outputs
+        QHash<PortId, QVariant>& outputs
         )>;
 
-    explicit Node() = default;
+    explicit Node(const QString& name = {}, Callback cb = {});
 
-    explicit Node(const QString& name, Callback cb, QObject* parent = nullptr);
+    virtual ~Node() = default;
 
-    virtual QString name() const { return m_name; }
-    QVariantMap& params() { return m_params; }
+    QString name() const;
 
-    virtual bool execute(const QVector<QVariant>& inputs, NodeContext& ctx, QString& error, QVector<QVariant>& outputs)
-    {
-        bool ok = m_cb(m_params, inputs, ctx, error, outputs);
-        if (ok)
-            m_lastOutput = outputs;
-        return ok;
-    }
+    QVariantMap& params();
 
-    const QVector<QVariant>& lastOutput() const { return m_lastOutput; }
+    virtual bool execute(
+        const QHash<PortId, QVariant>& inputs,
+        NodeContext& ctx,
+        QString& error,
+        QHash<PortId, QVariant>& outputs);
+
+    const QHash<PortId, QVariant>& lastOutput() const;
+
+    // -------- Ports --------
+    QVector<NodePort> inputs() const;
+    QVector<NodePort> outputs() const;
 
     int countInputsPorts() const;
-    void setCountInputsPorts(int newCountInputsPorts);
-
     int countOutputsPorts() const;
-    void setCountOutputsPorts(int newCountOutputsPorts);
 
-signals:
-    void updated();
+    void setInputs(const QVector<NodePort>& inputs);
+    void setOutputs(const QVector<NodePort>& outputs);
 
-private:
-    QString m_name;
-    QVariantMap m_params;
-    Callback m_cb;
-    QVector<QVariant> m_lastOutput;
+protected:
+    QString _name;
+    QVariantMap _params;
+    Callback _callback;
 
-    int _countInputsPorts { 0 };
-    int _countOutputsPorts { 0 };
+    QVector<NodePort> _inputs;
+    QVector<NodePort> _outputs;
+
+    QHash<PortId, QVariant> _lastOutput;
 };
 
+// ===================== StartNode =====================
 class StartNode : public Node
 {
 public:
-    explicit StartNode() = default;
-    QString name() const override { return "Start"; }
+    explicit StartNode()
+        : Node("Start")
+    {}
 
-    bool execute(const QVector<QVariant>&,
-                 NodeContext&,
-                 QString&,
-                 QVector<QVariant>&) override
+    bool execute(
+        const QHash<PortId, QVariant>&,
+        NodeContext&,
+        QString&,
+        QHash<PortId, QVariant>&) override
     {
         qInfo() << "start";
-        return true; // ничего не делает
+        return true;
     }
 };
 
@@ -100,16 +85,19 @@ public:
 template<typename T>
 struct MethodNodeFactoryHybrid;
 
+// -------- Method specialization --------
 template<typename Device, typename R, typename... Args>
 struct MethodNodeFactoryHybrid<R(Device::*)(Args...)>
 {
     static Node::Callback make(R(Device::*method)(Args...))
     {
-        return [method](const QVariantMap& params,
-                        const QVector<QVariant>& inputs,
-                        NodeContext& ctx,
-                        QString& error,
-                        QVector<QVariant>& outputs) -> bool
+        return [method](
+                   const QVariantMap& params,
+                   const QHash<PortId, QVariant>& inputs,
+                   NodeContext& ctx,
+                   QString& error,
+                   QHash<PortId, QVariant>& outputs
+                   ) -> bool
         {
             Device* dev = ctx.get<Device>();
             if (!dev) {
@@ -117,38 +105,43 @@ struct MethodNodeFactoryHybrid<R(Device::*)(Args...)>
                 return false;
             }
 
-            if (inputs.size() > sizeof...(Args)) {
-                error = "Too many inputs";
-                // return false;
+            QVector<QVariant> orderedInputs = inputs.values().toVector();
+
+            try {
+                call(method, dev, params, orderedInputs, outputs,
+                     std::index_sequence_for<Args...>{});
+            }
+            catch (...) {
+                error = "Method invocation failed";
+                return false;
             }
 
-            call(method, dev, params, inputs, outputs,
-                 std::index_sequence_for<Args...>{});
             return true;
         };
     }
 
 private:
     template<std::size_t... I>
-    static void call(R(Device::*method)(Args...),
-                     Device* dev,
-                     const QVariantMap& params,
-                     const QVector<QVariant>& inputs,
-                     QVector<QVariant>& outputs,
-                     std::index_sequence<I...>)
+    static void call(
+        R(Device::*method)(Args...),
+        Device* dev,
+        const QVariantMap& params,
+        const QVector<QVariant>& inputs,
+        QHash<PortId, QVariant>& outputs,
+        std::index_sequence<I...>
+        )
     {
-        auto getArg = [&](size_t i, auto /*typeTag*/) -> QVariant {
+        auto getArg = [&](int i) -> QVariant {
             if (i < inputs.size())
                 return inputs[i];
-            else
-                return params.value(QString("arg%1").arg(i));
+            return params.value(QString("arg%1").arg(i));
         };
 
         if constexpr (std::is_void_v<R>) {
-            (dev->*method)(getArg(I, (Args*)nullptr).template value<Args>()...);
+            (dev->*method)(getArg(I).template value<Args>()...);
         } else {
-            R r = (dev->*method)(getArg(I, (Args*)nullptr).template value<Args>()...);
-            outputs = { QVariant::fromValue(r) };
+            R r = (dev->*method)(getArg(I).template value<Args>()...);
+            outputs.insert(QUuid::createUuid(), QVariant::fromValue(r));
         }
     }
 };

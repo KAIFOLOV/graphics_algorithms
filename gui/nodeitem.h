@@ -32,7 +32,7 @@ public:
     const QVector<ConnectionItem*>& connections() const { return m_connections; }
 
     // собрать данные с входных портов
-    QVector<QVariant> collectInputData() const;
+    // QVector<QVariant> collectInputData() const;
 
     void removeConnection(ConnectionItem *c);
 protected:

@@ -4,6 +4,20 @@
 #include "qpainter.h"
 #include <QGraphicsScene>
 
+#include "../Graph.h"
+
+static Graph* graphFromScene(QGraphicsScene* scene)
+{
+    if (!scene)
+        return nullptr;
+
+    QVariant v = scene->property("graph");
+    if (!v.isValid())
+        return nullptr;
+
+    return v.value<Graph*>();
+}
+
 void PortItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     if (event->button() != Qt::LeftButton)
@@ -22,7 +36,9 @@ void PortItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 void PortItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    if(!m_tempLine) return;
+    if(!m_tempLine)
+        return;
+
     QLineF line(m_tempLine->line().p1(), event->scenePos());
     m_tempLine->setLine(line);
 }
@@ -32,54 +48,73 @@ void PortItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     if (!m_tempLine)
         return;
 
-    auto itemsAtPos = scene()->items(event->scenePos());
-    for (auto* it : itemsAtPos)
-    {
-        auto* target = qgraphicsitem_cast<PortItem*>(it);
-        if (!target)
+    // ищем порт под курсором
+    PortItem* target = nullptr;
+    const auto items = scene()->items(event->scenePos());
+    for (auto* it : items) {
+        auto* p = qgraphicsitem_cast<PortItem*>(it);
+        if (!p || p == this)
             continue;
 
-        if (target == this)
-            continue;
-
-        if (target->getDirection() == m_dir)
-            continue;
-
-        if (target->kind() != kind())
-            continue; // data нельзя соединять с control
-
-        if (target->getDirection() == getDirection())
-            continue; // input-input / output-output нельзя
-
-        if (!this->canAcceptConnection())
-            break;
-
-        if (!target->canAcceptConnection())
-            break;
-
-        auto* conn = new ConnectionItem(this, target);
-        scene()->addItem(conn);
-
-        // Порты
-        // addConnection(conn);
-        // target->addConnection(conn);
-
-        // 🔥 НОДЫ
-        if (auto* n1 = parentNodeItem())
-            n1->addConnection(conn);
-        if (auto* n2 = target->parentNodeItem())
-            n2->addConnection(conn);
-
+        target = p;
         break;
     }
 
-    scene()->removeItem(m_tempLine);
-    delete m_tempLine;
+    // временная линия будет удалена в любом случае
+    QGraphicsLineItem* tempLine = m_tempLine;
     m_tempLine = nullptr;
+    scene()->removeItem(tempLine);
+    delete tempLine;
+
+    // нет цели — выходим
+    if (!target)
+        return;
+
+    // проверка направления и типа порта
+    if (target->kind() != kind() || target->getDirection() == getDirection())
+        return;
+
+    // проверка возможности соединения
+    if (!canAcceptConnection() || !target->canAcceptConnection())
+        return;
+
+    // получаем граф
+    Graph* graph = graphFromScene(scene());
+    if (!graph)
+        return;
+
+    NodeItem* fromItem = parentNodeItem();
+    NodeItem* toItem   = target->parentNodeItem();
+    if (!fromItem || !toItem)
+        return;
+
+    // создаем логическое соединение
+    Connection model;
+    model.from    = fromItem->node();
+    model.to      = toItem->node();
+    model.outPort = m_portId;
+    model.inPort  = target->portId();
+    model.type    = (kind() == PortKind::Control)
+                     ? Connection::Type::Control
+                     : Connection::Type::Data;
+
+    QString error;
+    if (!graph->addConnection(model, error)) {
+        qWarning() << "Connection rejected:" << error;
+        return;
+    }
+
+    // создаем GUI-соединение
+    auto* item = new ConnectionItem(model, this, target);
+    scene()->addItem(item);
+
+    fromItem->addConnection(item);
+    toItem->addConnection(item);
 }
 
 void PortItem::addConnection(ConnectionItem *conn) {
-    m_connections.append(conn);
+    if (!m_connections.contains(conn))
+        m_connections.append(conn);
 }
 
 NodeItem *PortItem::parentNodeItem() const

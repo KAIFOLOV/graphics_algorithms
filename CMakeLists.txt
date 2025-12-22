@@ -39,6 +39,11 @@ set(HEADERS
 add_executable(test_nodes
     ${SOURCES}
     ${HEADERS}
+    CompositeNode.h CompositeNode.cpp
+    NodePort.h NodePort.cpp
+    NodeContext.h
+    Connection.h Connection.cpp
+    Graph.h Graph.cpp
 )
 
 target_link_libraries(test_nodes PRIVATE Qt5::Widgets)

@@ -25,7 +25,7 @@ MainWindow::MainWindow()
         m_palette->addItem(n);
 
     // Центральная панель — canvas
-    m_view = new WorkflowView;
+    _view = new WorkflowView;
 
     // Правая панель — свойства выбранной ноды
     m_props = new PropertiesWidget;
@@ -33,7 +33,7 @@ MainWindow::MainWindow()
     // Основной сплиттер
     auto* splitter = new QSplitter;
     splitter->addWidget(m_palette);
-    splitter->addWidget(m_view);
+    splitter->addWidget(_view);
     splitter->addWidget(m_props);
     splitter->setStretchFactor(1, 1); // canvas растягивается
 
@@ -41,15 +41,22 @@ MainWindow::MainWindow()
 
     // Кнопка запуска workflow — добавляем в toolbar
     auto* toolbar = addToolBar("Workflow");
+
     auto* runBtn = new QPushButton("Run");
     toolbar->addWidget(runBtn);
+
+    auto* saveBtn = new QPushButton("Save");
+    toolbar->addWidget(saveBtn);
 
     connect(runBtn, &QPushButton::clicked, this, [this]() {
         NodeContext ctx;
         ctx.set(m_vna);
 
         WorkflowExecutor exec;
-        exec.run(m_view->scene(), ctx);
+        exec.run(*_view->graph(), ctx);
+    });
+
+    connect(saveBtn, &QPushButton::clicked, this, [this]() {
     });
 
     // Подключаем добавление ноды при двойном клике на палитре
@@ -57,7 +64,7 @@ MainWindow::MainWindow()
             this, &MainWindow::addNode);
 
     // Подключаем отображение свойств при выборе ноды
-    connect(m_view->scene(), &QGraphicsScene::selectionChanged,
+    connect(_view->scene(), &QGraphicsScene::selectionChanged,
             this, &MainWindow::selectionChanged);
 }
 
@@ -67,14 +74,16 @@ void MainWindow::addNode(QListWidgetItem* item)
     if (!node)
         return;
 
+    _view->graph()->addNode(node);
+
     auto* ni = new NodeItem(node);
-    m_view->scene()->addItem(ni);
+    _view->scene()->addItem(ni);
     ni->setPos(50, 50);
 }
 
 void MainWindow::selectionChanged()
 {
-    auto items = m_view->scene()->selectedItems();
+    auto items = _view->scene()->selectedItems();
     if (items.isEmpty())
         return;
 

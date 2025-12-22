@@ -5,8 +5,8 @@
 
 #include <QPainter>
 
-ConnectionItem::ConnectionItem(PortItem* from, PortItem* to)
-    : m_from(from), m_to(to)
+ConnectionItem::ConnectionItem(const Connection& model, PortItem* from, PortItem* to)
+    : m_model(model), m_from(from), m_to(to)
 {
     setPen(QPen(Qt::black, 2));
     setZValue(-1);
@@ -14,6 +14,7 @@ ConnectionItem::ConnectionItem(PortItem* from, PortItem* to)
 
     from->addConnection(this);
     to->addConnection(this);
+    updatePath();
 }
 
 void ConnectionItem::updatePath()
