@@ -32,10 +32,11 @@ public:
     }
     void setPoints(int pts) override {
         qInfo() << "setPoints" << pts;
+        _points = pts;
     }
     int getNumber() override {
         qInfo() << "getNumber";
-        return 8;
+        return _points;
     }
     bool isPower() override {
         qInfo() << "isPower";
@@ -44,6 +45,9 @@ public:
     void printNumber(int number) override {
         qInfo() << "printNumber" << number;
     }
+
+private:
+    int _points;
 };
 
 #endif // IVNA_H
