@@ -5,12 +5,16 @@
 
 struct Connection
 {
-    Node* from;
+    Node *from;
     PortId outPort;
-    Node* to;
+    Node *to;
     PortId inPort;
 
-    enum class Type { Control, Data } type;
+    enum class Type
+    {
+        Control,
+        Data
+    } type;
 };
 
 #endif // CONNECTION_H

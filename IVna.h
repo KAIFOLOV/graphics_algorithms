@@ -20,29 +20,36 @@ public:
 class FakeVna : public IVna
 {
 public:
-    bool connect() override {
+    bool connect() override
+    {
         qInfo() << "connect";
         return true;
     }
-    void setStartFrequency(double hz) override {
+    void setStartFrequency(double hz) override
+    {
         qInfo() << "setStartFrequency" << hz;
     }
-    void setStopFrequency(double hz) override {
+    void setStopFrequency(double hz) override
+    {
         qInfo() << "setStopFrequency" << hz;
     }
-    void setPoints(int pts) override {
+    void setPoints(int pts) override
+    {
         qInfo() << "setPoints" << pts;
         _points = pts;
     }
-    int getNumber() override {
+    int getNumber() override
+    {
         qInfo() << "getNumber";
         return _points;
     }
-    bool isPower() override {
+    bool isPower() override
+    {
         qInfo() << "isPower";
         return true;
     }
-    void printNumber(int number) override {
+    void printNumber(int number) override
+    {
         qInfo() << "printNumber" << number;
     }
 

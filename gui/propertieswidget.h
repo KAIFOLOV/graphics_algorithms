@@ -8,12 +8,12 @@ class PropertiesWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PropertiesWidget(QWidget* parent = nullptr);
+    explicit PropertiesWidget(QWidget *parent = nullptr);
 
-    void setNode(Node* node);
+    void setNode(Node *node);
 
 private:
-    QWidget* m_editor = nullptr;
+    QWidget *m_editor = nullptr;
 };
 
 #endif // PROPERTIESWIDGET_H

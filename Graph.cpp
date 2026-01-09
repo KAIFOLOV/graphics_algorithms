@@ -2,19 +2,18 @@
 
 bool Graph::execute(NodeContext &ctx, QString &error)
 {
-    StartNode* start = nullptr;
+    StartNode *start = nullptr;
 
     // ⚠️ Упрощённо: линейно
-    for (Node* n : _nodes)
-    {
-        if (auto* s = dynamic_cast<StartNode*>(n)) {
+    for (Node *n : _nodes) {
+        if (auto *s = dynamic_cast<StartNode *>(n)) {
             start = s;
             break;
         }
 
         QHash<PortId, QVariant> inputs;
 
-        for (auto& e : _edges)
+        for (auto &e : _edges)
             if (e.to == n)
                 inputs[e.inPort] = e.from->lastOutput().value(e.outPort);
 
@@ -25,7 +24,7 @@ bool Graph::execute(NodeContext &ctx, QString &error)
     return true;
 }
 
-void Graph::addNode(Node* node)
+void Graph::addNode(Node *node)
 {
     _nodes.push_back(node);
 }
@@ -39,12 +38,12 @@ bool Graph::addConnection(const Connection &c, QString &error)
     return true;
 }
 
-bool Graph::buildExecutionOrder(QVector<Node*>& order, QString& error)
+bool Graph::buildExecutionOrder(QVector<Node *> &order, QString &error)
 {
     // ищем StartNode
-    Node* start = nullptr;
-    for (Node* n : _nodes) {
-        if (dynamic_cast<StartNode*>(n)) {
+    Node *start = nullptr;
+    for (Node *n : _nodes) {
+        if (dynamic_cast<StartNode *>(n)) {
             start = n;
             break;
         }
@@ -55,8 +54,8 @@ bool Graph::buildExecutionOrder(QVector<Node*>& order, QString& error)
         return false;
     }
 
-    QSet<Node*> visited;
-    Node* current = start;
+    QSet<Node *> visited;
+    Node *current = start;
 
     while (current) {
         if (visited.contains(current)) {
@@ -68,8 +67,8 @@ bool Graph::buildExecutionOrder(QVector<Node*>& order, QString& error)
         order << current;
 
         // ищем следующую по control-edge
-        Node* next = nullptr;
-        for (const Connection& c : _edges) {
+        Node *next = nullptr;
+        for (const Connection &c : _edges) {
             if (c.from == current && c.type == Connection::Type::Control) {
                 next = c.to;
                 break;
@@ -82,7 +81,7 @@ bool Graph::buildExecutionOrder(QVector<Node*>& order, QString& error)
     return true;
 }
 
-bool Graph::validateConnection(const Connection& c, QString& error) const
+bool Graph::validateConnection(const Connection &c, QString &error) const
 {
     if (!c.from || !c.to) {
         error = "Null node in connection";

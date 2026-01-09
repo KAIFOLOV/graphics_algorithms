@@ -6,7 +6,7 @@
 class WorkflowExecutor
 {
 public:
-    void run(Graph& graph, NodeContext& ctx);
+    void run(Graph &graph, NodeContext &ctx);
 };
 
 #endif // WORKFLOWEXECUTOR_H

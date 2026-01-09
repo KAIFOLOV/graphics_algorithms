@@ -21,20 +21,20 @@ public:
     MainWindow();
 
 private slots:
-    void addNode(QListWidgetItem* item);
+    void addNode(QListWidgetItem *item);
     void selectionChanged();
 
 private:
     // UI элементы
-    QListWidget*      m_palette = nullptr;
-    WorkflowView*     _view = nullptr;
-    PropertiesWidget* m_props = nullptr;
+    QListWidget *m_palette = nullptr;
+    WorkflowView *_view = nullptr;
+    PropertiesWidget *m_props = nullptr;
 
     // Контейнер для canvas + кнопка Run
-    QWidget*          m_viewContainer = nullptr;
+    QWidget *m_viewContainer = nullptr;
 
     // Прибор
-    IVna*          m_vna = nullptr;
+    IVna *m_vna = nullptr;
 };
 
 #endif // MAINWINDOW_H

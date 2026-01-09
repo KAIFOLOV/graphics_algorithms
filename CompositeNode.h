@@ -9,10 +9,10 @@ public:
     explicit CompositeNode();
     explicit CompositeNode(const QList<Node *> &nodes);
 
-    bool execute(const QHash<PortId, QVariant>& inputs,
-                 NodeContext& ctx,
-                 QString& error,
-                 QHash<PortId, QVariant>& outputs) override;
+    bool execute(const QHash<PortId, QVariant> &inputs,
+                 NodeContext &ctx,
+                 QString &error,
+                 QHash<PortId, QVariant> &outputs) override;
 
 private:
     QList<Node *> _nodes;

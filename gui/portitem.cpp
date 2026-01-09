@@ -6,7 +6,7 @@
 
 #include "../Graph.h"
 
-static Graph* graphFromScene(QGraphicsScene* scene)
+static Graph *graphFromScene(QGraphicsScene *scene)
 {
     if (!scene)
         return nullptr;
@@ -15,17 +15,17 @@ static Graph* graphFromScene(QGraphicsScene* scene)
     if (!v.isValid())
         return nullptr;
 
-    return v.value<Graph*>();
+    return v.value<Graph *>();
 }
 
-void PortItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
+void PortItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton)
         return;
 
     // 🔥 если есть соединение — рвём его
     if (!m_connections.isEmpty()) {
-        auto* conn = m_connections.first();
+        auto *conn = m_connections.first();
         conn->disconnect();
     }
 
@@ -34,25 +34,25 @@ void PortItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
     event->accept();
 }
 
-void PortItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+void PortItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!m_tempLine)
+    if (!m_tempLine)
         return;
 
     QLineF line(m_tempLine->line().p1(), event->scenePos());
     m_tempLine->setLine(line);
 }
 
-void PortItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void PortItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!m_tempLine)
         return;
 
     // ищем порт под курсором
-    PortItem* target = nullptr;
+    PortItem *target = nullptr;
     const auto items = scene()->items(event->scenePos());
-    for (auto* it : items) {
-        auto* p = qgraphicsitem_cast<PortItem*>(it);
+    for (auto *it : items) {
+        auto *p = qgraphicsitem_cast<PortItem *>(it);
         if (!p || p == this)
             continue;
 
@@ -61,7 +61,7 @@ void PortItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     }
 
     // временная линия будет удалена в любом случае
-    QGraphicsLineItem* tempLine = m_tempLine;
+    QGraphicsLineItem *tempLine = m_tempLine;
     m_tempLine = nullptr;
     scene()->removeItem(tempLine);
     delete tempLine;
@@ -79,24 +79,22 @@ void PortItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
         return;
 
     // получаем граф
-    Graph* graph = graphFromScene(scene());
+    Graph *graph = graphFromScene(scene());
     if (!graph)
         return;
 
-    NodeItem* fromItem = parentNodeItem();
-    NodeItem* toItem   = target->parentNodeItem();
+    NodeItem *fromItem = parentNodeItem();
+    NodeItem *toItem = target->parentNodeItem();
     if (!fromItem || !toItem)
         return;
 
     // создаем логическое соединение
     Connection model;
-    model.from    = fromItem->node();
-    model.to      = toItem->node();
+    model.from = fromItem->node();
+    model.to = toItem->node();
     model.outPort = m_portId;
-    model.inPort  = target->portId();
-    model.type    = (kind() == PortKind::Control)
-                     ? Connection::Type::Control
-                     : Connection::Type::Data;
+    model.inPort = target->portId();
+    model.type = (kind() == PortKind::Control) ? Connection::Type::Control : Connection::Type::Data;
 
     QString error;
     if (!graph->addConnection(model, error)) {
@@ -105,24 +103,25 @@ void PortItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     }
 
     // создаем GUI-соединение
-    auto* item = new ConnectionItem(model, this, target);
+    auto *item = new ConnectionItem(model, this, target);
     scene()->addItem(item);
 
     fromItem->addConnection(item);
     toItem->addConnection(item);
 }
 
-void PortItem::addConnection(ConnectionItem *conn) {
+void PortItem::addConnection(ConnectionItem *conn)
+{
     if (!m_connections.contains(conn))
         m_connections.append(conn);
 }
 
 NodeItem *PortItem::parentNodeItem() const
 {
-    return qgraphicsitem_cast<NodeItem*>(parentItem());
+    return qgraphicsitem_cast<NodeItem *>(parentItem());
 }
 
-void PortItem::paint(QPainter* p, const QStyleOptionGraphicsItem*, QWidget*)
+void PortItem::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
 {
     QColor color;
     if (m_kind == PortKind::Control)
@@ -138,15 +137,13 @@ void PortItem::paint(QPainter* p, const QStyleOptionGraphicsItem*, QWidget*)
 bool PortItem::canAcceptConnection() const
 {
     // 🔴 Главное правило
-    if (m_kind == PortKind::Control &&
-        m_dir == Direction::Output &&
-        !m_connections.isEmpty())
+    if (m_kind == PortKind::Control && m_dir == Direction::Output && !m_connections.isEmpty())
         return false;
 
     return true;
 }
 
-void PortItem::removeConnection(ConnectionItem* c)
+void PortItem::removeConnection(ConnectionItem *c)
 {
     m_connections.removeOne(c);
 }

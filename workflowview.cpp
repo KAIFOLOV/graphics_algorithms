@@ -5,10 +5,9 @@
 #include <QGraphicsScene>
 #include <QPainter>
 
-WorkflowView::WorkflowView(QWidget* parent)
-    : QGraphicsView(parent)
+WorkflowView::WorkflowView(QWidget *parent) : QGraphicsView(parent)
 {
-    qRegisterMetaType<Graph*>("Graph*");
+    qRegisterMetaType<Graph *>("Graph*");
 
     _graph = new Graph();
     // _graph->addNode(new StartNode());

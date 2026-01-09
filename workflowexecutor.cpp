@@ -4,7 +4,7 @@
 
 #include <QDebug>
 
-void WorkflowExecutor::run(Graph& graph, NodeContext& ctx)
+void WorkflowExecutor::run(Graph &graph, NodeContext &ctx)
 {
     QString error;
     if (!graph.execute(ctx, error)) {

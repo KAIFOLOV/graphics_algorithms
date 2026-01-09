@@ -1,22 +1,22 @@
 #include "node.h"
 
-Node::Node(const QString &name, Callback cb)
-    : _name(name), _callback(cb)
+Node::Node(const QString &name, Callback cb) : _name(name), _callback(cb)
 {}
 
-QString Node::name() const {
+QString Node::name() const
+{
     return _name;
 }
 
-QVariantMap &Node::params() {
+QVariantMap &Node::params()
+{
     return _params;
 }
 
-bool Node::execute(
-    const QHash<PortId, QVariant>& inputs,
-    NodeContext& ctx,
-    QString& error,
-    QHash<PortId, QVariant>& outputs)
+bool Node::execute(const QHash<PortId, QVariant> &inputs,
+                   NodeContext &ctx,
+                   QString &error,
+                   QHash<PortId, QVariant> &outputs)
 {
     if (!_callback)
         return true;
@@ -28,7 +28,8 @@ bool Node::execute(
     return ok;
 }
 
-const QHash<PortId, QVariant> &Node::lastOutput() const {
+const QHash<PortId, QVariant> &Node::lastOutput() const
+{
     return _lastOutput;
 }
 
