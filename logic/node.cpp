@@ -13,10 +13,10 @@ QVariantMap &Node::params()
     return _params;
 }
 
-bool Node::execute(const QHash<PortId, QVariant> &inputs,
+bool Node::execute(const QHash<QUuid, QVariant> &inputs,
                    NodeContext &ctx,
                    QString &error,
-                   QHash<PortId, QVariant> &outputs)
+                   QHash<QUuid, QVariant> &outputs)
 {
     if (!_callback)
         return true;
@@ -28,7 +28,7 @@ bool Node::execute(const QHash<PortId, QVariant> &inputs,
     return ok;
 }
 
-const QHash<PortId, QVariant> &Node::lastOutput() const
+const QHash<QUuid, QVariant> &Node::lastOutput() const
 {
     return _lastOutput;
 }
@@ -43,22 +43,22 @@ int Node::countOutputsPorts() const
     return _outputs.count();
 }
 
-QVector<NodePort> Node::inputs() const
+QVector<Port> Node::inputs() const
 {
     return _inputs;
 }
 
-void Node::setInputs(const QVector<NodePort> &newInputs)
+void Node::setInputs(const QVector<Port> &newInputs)
 {
     _inputs = newInputs;
 }
 
-QVector<NodePort> Node::outputs() const
+QVector<Port> Node::outputs() const
 {
     return _outputs;
 }
 
-void Node::setOutputs(const QVector<NodePort> &newOutputs)
+void Node::setOutputs(const QVector<Port> &newOutputs)
 {
     _outputs = newOutputs;
 }

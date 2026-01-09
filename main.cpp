@@ -1,7 +1,8 @@
 #include "IVna.h"
 #include "gui/mainwindow.h"
-#include "node.h"
+#include "logic/node.h"
 #include "nodefactory.h"
+#include "MethodNodeFactoryHybrid.h"
 
 #include <QApplication>
 
@@ -45,7 +46,7 @@ void registerVnaNodes()
     f.registerNode("Get Number", []() -> Node * {
         auto node = new Node(
          "Get Number", MethodNodeFactoryHybrid<decltype(&IVna::getNumber)>::make(&IVna::getNumber));
-        node->setOutputs({ NodePort("Number") });
+        node->setOutputs({ Port(Port::Type::Data, "Number") });
         return node;
     });
 
@@ -54,7 +55,7 @@ void registerVnaNodes()
         auto *node =
          new Node("Print Number",
                   MethodNodeFactoryHybrid<decltype(&IVna::printNumber)>::make(&IVna::printNumber));
-        node->setInputs({ NodePort("Number") });
+        node->setInputs({ Port(Port::Type::Data, "Number") });
         return node;
     });
 }
