@@ -1,6 +1,13 @@
 #include "Port.h"
 
-Port::Port(Type type, const QString &name) : _type(type), _name(name)
+Port::Port(Type type, const QString &name) : _id(QUuid::createUuid()), _type(type), _name(name)
+{}
+
+Port::Port(Type type, Direction direction, const QString &name) :
+    _id(QUuid::createUuid()),
+    _type(type),
+    _direction(direction),
+    _name(name)
 {}
 
 QUuid Port::id() const
@@ -26,4 +33,14 @@ QString Port::name() const
 void Port::setName(const QString &newName)
 {
     _name = newName;
+}
+
+Port::Direction Port::direction() const
+{
+    return _direction;
+}
+
+void Port::setDirection(Port::Direction newDirection)
+{
+    _direction = newDirection;
 }

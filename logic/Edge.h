@@ -1,7 +1,7 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include "node.h"
+#include "Node.h"
 
 class Edge
 {
@@ -14,6 +14,8 @@ public:
 
     Port *to() const;
     void setTo(Port *newTo);
+
+    bool isControl() const;
 
 private:
     Port *_from;

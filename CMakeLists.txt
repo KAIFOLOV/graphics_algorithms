@@ -13,26 +13,26 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets)
 set(SOURCES
     main.cpp
     gui/mainwindow.cpp
-    logic/node.cpp
+    logic/Node.cpp
     nodefactory.cpp
-    gui/nodeitem.cpp
-    workflowview.cpp
+    gui/NodeItem.cpp
+    gui/WorkflowView.cpp
     gui/propertieswidget.cpp
     gui/portitem.cpp
-    gui/connectionitem.cpp
+    gui/EdgeItem.cpp
     workflowexecutor.cpp
 )
 
 set(HEADERS
     gui/mainwindow.h
-    logic/node.h
+    logic/Node.h
     IVna.h
     nodefactory.h
-    gui/nodeitem.h
-    workflowview.h
+    gui/NodeItem.h
+    gui/WorkflowView.h
     gui/propertieswidget.h
     gui/portitem.h
-    gui/connectionitem.h
+    gui/EdgeItem.h
     workflowexecutor.h
 )
 
@@ -45,6 +45,7 @@ add_executable(test_nodes
     logic/Graph.h logic/Graph.cpp
     logic/Edge.h logic/Edge.cpp
     MethodNodeFactoryHybrid.h
+    gui/GraphItem.h gui/GraphItem.cpp
 )
 
 target_link_libraries(test_nodes PRIVATE Qt5::Widgets)

@@ -20,7 +20,6 @@ public:
     using Callback = std::function<bool(const QVariantMap &params,
                                         const QHash<QUuid, QVariant> &inputs,
                                         NodeContext &ctx,
-                                        QString &error,
                                         QHash<QUuid, QVariant> &outputs)>;
 
     explicit Node(const QString &name = {}, Callback cb = {});
@@ -31,28 +30,34 @@ public:
 
     virtual bool execute(const QHash<QUuid, QVariant> &inputs,
                          NodeContext &ctx,
-                         QString &error,
                          QHash<QUuid, QVariant> &outputs);
 
     const QHash<QUuid, QVariant> &lastOutput() const;
 
     // -------- Ports --------
-    QVector<Port> inputs() const;
-    QVector<Port> outputs() const;
+    QVector<Port *> inputs() const;
+    QVector<Port *> outputs() const;
 
     int countInputsPorts() const;
     int countOutputsPorts() const;
 
-    void setInputs(const QVector<Port> &inputs);
-    void setOutputs(const QVector<Port> &outputs);
+    void addInput(Port *port);
+    void addOutput(Port *port);
+
+    Port *controlOutput() const;
+
+    Port *controlInput() const;
 
 protected:
     QString _name;
     QVariantMap _params;
     Callback _callback;
 
-    QVector<Port> _inputs;
-    QVector<Port> _outputs;
+    QVector<Port *> _inputs;
+    QVector<Port *> _outputs;
+
+    Port *_controlInput;
+    Port *_controlOutput;
 
     QHash<QUuid, QVariant> _lastOutput;
 };
@@ -64,10 +69,7 @@ public:
     explicit StartNode() : Node("Start")
     {}
 
-    bool execute(const QHash<QUuid, QVariant> &,
-                 NodeContext &,
-                 QString &,
-                 QHash<QUuid, QVariant> &) override
+    bool execute(const QHash<QUuid, QVariant> &, NodeContext &, QHash<QUuid, QVariant> &) override
     {
         qInfo() << "start";
         return true;

@@ -1,8 +1,10 @@
 #ifndef WORKFLOWVIEW_H
 #define WORKFLOWVIEW_H
 
-#include "Graph.h"
-#include "gui/nodeitem.h"
+#include "../logic/Graph.h"
+#include "GraphItem.h"
+#include "NodeItem.h"
+
 #include <QGraphicsView>
 
 class WorkflowView : public QGraphicsView
@@ -11,17 +13,11 @@ class WorkflowView : public QGraphicsView
 public:
     explicit WorkflowView(QWidget *parent = nullptr);
 
-    StartNodeItem *startNode() const
-    {
-        return m_startNode;
-    }
-
     Graph *graph() const;
 
 private:
-    Graph *_graph;
-    QGraphicsScene *m_scene;
-    StartNodeItem *m_startNode = nullptr;
+    Graph *_graph { nullptr };
+    GraphItem *_graphItem { nullptr };
 };
 
 #endif // WORKFLOWVIEW_H

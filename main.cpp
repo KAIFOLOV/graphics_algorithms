@@ -1,6 +1,6 @@
 #include "IVna.h"
 #include "gui/mainwindow.h"
-#include "logic/node.h"
+#include "logic/Node.h"
 #include "nodefactory.h"
 #include "MethodNodeFactoryHybrid.h"
 
@@ -21,7 +21,7 @@ void registerVnaNodes()
         auto *n = new Node("Set Start Frequency",
                            MethodNodeFactoryHybrid<decltype(&IVna::setStartFrequency)>::make(
                             &IVna::setStartFrequency));
-        n->params()["arg0"] = 1e9; // GUI параметр по умолчанию
+        n->params()["startFreq"] = 1e9; // GUI параметр по умолчанию
         return n;
     });
 
@@ -30,7 +30,7 @@ void registerVnaNodes()
         auto *n = new Node(
          "Set Stop Frequency",
          MethodNodeFactoryHybrid<decltype(&IVna::setStopFrequency)>::make(&IVna::setStopFrequency));
-        n->params()["arg0"] = 10e9;
+        n->params()["stopFreq"] = 10e9;
         return n;
     });
 
@@ -38,7 +38,7 @@ void registerVnaNodes()
     f.registerNode("Set Points", []() -> Node * {
         auto *n = new Node(
          "Set Points", MethodNodeFactoryHybrid<decltype(&IVna::setPoints)>::make(&IVna::setPoints));
-        n->params()["arg0"] = 201;
+        n->params()["countPoints"] = 201;
         return n;
     });
 
@@ -46,7 +46,7 @@ void registerVnaNodes()
     f.registerNode("Get Number", []() -> Node * {
         auto node = new Node(
          "Get Number", MethodNodeFactoryHybrid<decltype(&IVna::getNumber)>::make(&IVna::getNumber));
-        node->setOutputs({ Port(Port::Type::Data, "Number") });
+        node->addOutput(new Port(Port::Type::Data, "Number"));
         return node;
     });
 
@@ -55,7 +55,7 @@ void registerVnaNodes()
         auto *node =
          new Node("Print Number",
                   MethodNodeFactoryHybrid<decltype(&IVna::printNumber)>::make(&IVna::printNumber));
-        node->setInputs({ Port(Port::Type::Data, "Number") });
+        node->addInput(new Port(Port::Type::Data, "Number"));
         return node;
     });
 }

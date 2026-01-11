@@ -1,6 +1,6 @@
 #include "nodefactory.h"
 
-#include "Node.h"
+#include "logic/Node.h"
 #include "IVna.h"
 
 NodeFactory &NodeFactory::instance()

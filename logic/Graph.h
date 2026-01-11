@@ -1,25 +1,28 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include "Connection.h"
-#include "node.h"
+#include "Edge.h"
+#include "Node.h"
 
 class Graph
 {
 public:
-    bool execute(NodeContext &ctx, QString &error);
+    explicit Graph() = default;
+
+    bool execute(NodeContext &context);
 
     void addNode(Node *node);
-    bool addConnection(const Connection &c, QString &error);
+    bool addEdge(Edge *edge);
 
 private:
     bool buildExecutionOrder(QVector<Node *> &order, QString &error);
-    bool validateConnection(const Connection &c, QString &error) const;
+    bool validateConnection(const Edge *edge) const;
 
 private:
     QVector<Node *> _nodes;
-    QVector<Connection> _edges;
+    QVector<Edge *> _edges;
 };
+
 Q_DECLARE_METATYPE(Graph *)
 
 #endif // GRAPH_H

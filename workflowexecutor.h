@@ -1,7 +1,7 @@
 #ifndef WORKFLOWEXECUTOR_H
 #define WORKFLOWEXECUTOR_H
 
-#include "Graph.h"
+#include "logic/Graph.h"
 
 class WorkflowExecutor
 {

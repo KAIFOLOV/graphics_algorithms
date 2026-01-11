@@ -1,75 +1,25 @@
 #ifndef PORTITEM_H
 #define PORTITEM_H
 
-#include <QGraphicsEllipseItem>
-#include <QVector>
+#include "../logic/Port.h"
+
 #include <QBrush>
+#include <QVector>
+#include <QGraphicsEllipseItem>
 #include <QGraphicsSceneMouseEvent>
-
-#include "../NodePort.h"
-
-class ConnectionItem;
-class NodeItem;
 
 class PortItem : public QGraphicsEllipseItem
 {
 public:
-    enum class Direction
-    {
-        Input,
-        Output
-    };
-    enum class PortKind
-    {
-        Data,
-        Control
-    };
+    explicit PortItem(Port *port, QGraphicsItem *parentNode);
 
-    PortItem(Direction dir, PortKind kind, QGraphicsItem *parentNode) :
-        QGraphicsEllipseItem(parentNode),
-        m_dir(dir),
-        m_kind(kind),
-        m_tempLine(nullptr)
-    {
-        setRect(-5, -5, 10, 10);
-        setBrush(dir == Direction::Input ? Qt::blue : Qt::green);
-        setFlag(QGraphicsItem::ItemIsSelectable);
-        setAcceptHoverEvents(true);
-    }
+    Port::Type getType() const;
+    Port::Direction getDirection() const;
 
-    Direction getDirection() const
-    {
-        return m_dir;
-    }
-    PortKind kind() const
-    {
-        return m_kind;
-    }
+    QPointF sceneCenter() const;
 
-    QPointF sceneCenter() const
-    {
-        return mapToScene(rect().center());
-    }
-
-    void addConnection(ConnectionItem *conn);
-    const QVector<ConnectionItem *> &connections() const
-    {
-        return m_connections;
-    }
-
-    void setPortId(const PortId &id)
-    {
-        m_portId = id;
-    }
-    PortId portId() const
-    {
-        return m_portId;
-    }
-
-    NodeItem *parentNodeItem() const;
-
-    bool canAcceptConnection() const;
-    void removeConnection(ConnectionItem *c);
+    Port *port() const;
+    QUuid portId() const;
 
 protected:
     void paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *) override;
@@ -78,14 +28,9 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
-    Direction m_dir;
-    PortKind m_kind;
-
-    QVector<ConnectionItem *> m_connections;
-
-    QGraphicsLineItem *m_tempLine;
-
-    PortId m_portId;
+    // Порт которые отрисовывает данный элемент
+    Port *_port;
+    QGraphicsLineItem *_tempLine;
 };
 
 #endif // PORTITEM_H

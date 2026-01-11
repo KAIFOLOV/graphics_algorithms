@@ -1,11 +1,11 @@
 #include "mainwindow.h"
-#include "nodeitem.h"
+#include "NodeItem.h"
 #include "propertieswidget.h"
-#include "../workflowview.h"
+#include "workflowview.h"
 #include "../workflowexecutor.h"
 #include "../nodefactory.h"
 #include "../IVna.h"
-#include "connectionitem.h"
+#include "EdgeItem.h"
 
 #include <QSplitter>
 #include <QPushButton>

@@ -6,10 +6,9 @@ CompositeNode::CompositeNode() : Node {}
 CompositeNode::CompositeNode(const QList<Node *> &nodes) : _nodes(nodes)
 {}
 
-bool CompositeNode::execute(const QHash<PortId, QVariant> &inputs,
+bool CompositeNode::execute(const QHash<QUuid, QVariant> &inputs,
                             NodeContext &ctx,
-                            QString &error,
-                            QHash<PortId, QVariant> &outputs)
+                            QHash<QUuid, QVariant> &outputs)
 {
     return true;
 }
