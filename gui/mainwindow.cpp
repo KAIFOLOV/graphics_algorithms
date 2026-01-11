@@ -17,23 +17,25 @@
 MainWindow::MainWindow()
 {
     // Создаём прибор (FakeVna для теста)
-    m_vna = new FakeVna;
+    _vna = new FakeVna;
 
     // Левая панель — палитра нод
-    m_palette = new QListWidget;
-    for (auto &n : NodeFactory::instance().nodeNames()) m_palette->addItem(n);
+    _palette = new QListWidget;
+    for (auto &node : NodeFactory::instance().nodeNames()) {
+        _palette->addItem(node);
+    }
 
     // Центральная панель — canvas
     _view = new WorkflowView;
 
     // Правая панель — свойства выбранной ноды
-    m_props = new PropertiesWidget;
+    _props = new PropertiesWidget;
 
     // Основной сплиттер
     auto *splitter = new QSplitter;
-    splitter->addWidget(m_palette);
+    splitter->addWidget(_palette);
     splitter->addWidget(_view);
-    splitter->addWidget(m_props);
+    splitter->addWidget(_props);
     splitter->setStretchFactor(1, 1); // canvas растягивается
 
     setCentralWidget(splitter);
@@ -49,7 +51,7 @@ MainWindow::MainWindow()
 
     connect(runBtn, &QPushButton::clicked, this, [this]() {
         NodeContext ctx;
-        ctx.set(m_vna);
+        ctx.set(_vna);
 
         WorkflowExecutor exec;
         exec.run(*_view->graph(), ctx);
@@ -58,7 +60,7 @@ MainWindow::MainWindow()
     connect(saveBtn, &QPushButton::clicked, this, [this]() {});
 
     // Подключаем добавление ноды при двойном клике на палитре
-    connect(m_palette, &QListWidget::itemDoubleClicked, this, &MainWindow::addNode);
+    connect(_palette, &QListWidget::itemDoubleClicked, this, &MainWindow::addNode);
 
     // Подключаем отображение свойств при выборе ноды
     connect(_view->scene(), &QGraphicsScene::selectionChanged, this, &MainWindow::selectionChanged);
@@ -85,5 +87,5 @@ void MainWindow::selectionChanged()
 
     auto *ni = dynamic_cast<NodeItem *>(items.first());
     if (ni)
-        m_props->setNode(ni->node());
+        _props->setNode(ni->node());
 }

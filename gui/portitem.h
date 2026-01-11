@@ -28,7 +28,6 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
-    // Порт которые отрисовывает данный элемент
     Port *_port;
     QGraphicsLineItem *_tempLine;
 };

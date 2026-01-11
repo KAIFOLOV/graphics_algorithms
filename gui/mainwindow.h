@@ -26,16 +26,18 @@ private slots:
     void selectionChanged();
 
 private:
-    // UI элементы
-    QListWidget *m_palette = nullptr;
-    WorkflowView *_view = nullptr;
-    PropertiesWidget *m_props = nullptr;
+    // Палетка с нодами
+    QListWidget *_palette { nullptr };
+    // Рабочая область редактора
+    WorkflowView *_view { nullptr };
+    // Окно с параметрами функции (аргументы которые не через вход)
+    PropertiesWidget *_props { nullptr };
 
     // Контейнер для canvas + кнопка Run
-    QWidget *m_viewContainer = nullptr;
+    QWidget *_viewContainer { nullptr };
 
     // Прибор
-    IVna *m_vna = nullptr;
+    IVna *_vna { nullptr };
 };
 
 #endif // MAINWINDOW_H
