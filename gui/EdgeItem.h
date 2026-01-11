@@ -14,8 +14,8 @@ public:
 
     Edge *edge() const;
 
-    PortItem *sourcePort() const;
-    PortItem *targetPort() const;
+    PortItem *fromPort() const;
+    PortItem *toPort() const;
 
 private:
     Edge *_edge;

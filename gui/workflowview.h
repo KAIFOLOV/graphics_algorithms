@@ -15,6 +15,8 @@ public:
 
     Graph *graph() const;
 
+    GraphItem *graphItem() const;
+
 private:
     Graph *_graph { nullptr };
     GraphItem *_graphItem { nullptr };

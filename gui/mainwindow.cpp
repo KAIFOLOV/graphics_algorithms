@@ -75,7 +75,7 @@ void MainWindow::addNode(QListWidgetItem *item)
     _view->graph()->addNode(node);
 
     auto *ni = new NodeItem(node);
-    _view->scene()->addItem(ni);
+    _view->graphItem()->addItem(ni);
     ni->setPos(50, 50);
 }
 

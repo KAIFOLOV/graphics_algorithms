@@ -14,10 +14,10 @@ class GraphItem : public QGraphicsScene
 public:
     explicit GraphItem(Graph *graph, QObject *parent = nullptr);
 
-    NodeItem *addNodeItem(Node *node, const QPointF &pos);
+    void addNodeItem(Node *node, const QPointF &pos);
     void removeNodeItem(NodeItem *item);
 
-    EdgeItem *createEdge(PortItem *from, PortItem *to);
+    void createEdge(PortItem *from, PortItem *to);
     void removeEdge(EdgeItem *edge);
 
 private:

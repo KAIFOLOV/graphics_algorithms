@@ -2,12 +2,12 @@
 #define NODEITEM_H
 
 #include "portitem.h"
+
 #include "qpainter.h"
 #include <QGraphicsObject>
 #include <QVector>
 
 class Node;
-class ConnectionItem;
 
 class NodeItem : public QGraphicsObject
 {
@@ -33,6 +33,8 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
     // Управляющие порты
     PortItem *_controlInput = nullptr;

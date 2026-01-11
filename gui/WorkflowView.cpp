@@ -17,3 +17,8 @@ Graph *WorkflowView::graph() const
 {
     return _graph;
 }
+
+GraphItem *WorkflowView::graphItem() const
+{
+    return _graphItem;
+}

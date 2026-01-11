@@ -8,6 +8,8 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsSceneMouseEvent>
 
+class EdgeItem;
+
 class PortItem : public QGraphicsEllipseItem
 {
 public:
@@ -21,6 +23,10 @@ public:
     Port *port() const;
     QUuid portId() const;
 
+    void addConnection(EdgeItem *edge);
+    void removeConnection(EdgeItem *edge);
+    const QList<EdgeItem *> &connections() const;
+
 protected:
     void paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -30,6 +36,7 @@ protected:
 private:
     Port *_port;
     QGraphicsLineItem *_tempLine;
+    QList<EdgeItem *> _connections;
 };
 
 #endif // PORTITEM_H

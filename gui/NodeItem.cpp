@@ -2,6 +2,7 @@
 
 #include "../logic/node.h"
 #include "portitem.h"
+#include "EdgeItem.h"
 
 #include "qgraphicsscene.h"
 #include "qgraphicssceneevent.h"
@@ -86,6 +87,27 @@ void NodeItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void NodeItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsObject::mouseReleaseEvent(event);
+}
+
+QVariant NodeItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemPositionHasChanged) {
+        auto updatePort = [](PortItem *p) {
+            for (EdgeItem *connection : p->connections()) {
+                connection->updatePath();
+            }
+        };
+
+        if (_controlInput)
+            updatePort(_controlInput);
+        if (_controlOutput)
+            updatePort(_controlOutput);
+
+        for (auto *port : _dataInputs) updatePort(port);
+        for (auto *port : _dataOutputs) updatePort(port);
+    }
+
+    return QGraphicsObject::itemChange(change, value);
 }
 
 StartNodeItem::StartNodeItem() : NodeItem(new StartNode)

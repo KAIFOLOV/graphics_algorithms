@@ -12,6 +12,9 @@ EdgeItem::EdgeItem(Edge *edge, PortItem *from, PortItem *to) : _edge(edge), _fro
 
 void EdgeItem::updatePath()
 {
+    if (!_from || !_to)
+        return;
+
     QPointF p1 = _from->sceneCenter();
     QPointF p2 = _to->sceneCenter();
 
@@ -28,12 +31,12 @@ Edge *EdgeItem::edge() const
     return _edge;
 }
 
-PortItem *EdgeItem::sourcePort() const
+PortItem *EdgeItem::fromPort() const
 {
     return _from;
 }
 
-PortItem *EdgeItem::targetPort() const
+PortItem *EdgeItem::toPort() const
 {
     return _to;
 }

@@ -1,4 +1,5 @@
 #include "portitem.h"
+#include "GraphItem.h"
 #include "qpainter.h"
 #include <QGraphicsScene>
 
@@ -18,6 +19,21 @@ PortItem::PortItem(Port *port, QGraphicsItem *parentNode) :
 QUuid PortItem::portId() const
 {
     return _port->id();
+}
+
+void PortItem::addConnection(EdgeItem *edge)
+{
+    _connections.append(edge);
+}
+
+void PortItem::removeConnection(EdgeItem *edge)
+{
+    _connections.removeOne(edge);
+}
+
+const QList<EdgeItem *> &PortItem::connections() const
+{
+    return _connections;
 }
 
 Port::Direction PortItem::getDirection() const
@@ -61,6 +77,15 @@ void PortItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() != Qt::LeftButton)
         return;
 
+    if (!_connections.isEmpty()) {
+        auto *gs = qobject_cast<GraphItem *>(scene());
+        if (gs) {
+            // Копия списка, потому что removeConnection() меняет _connections
+            auto tmp = _connections;
+            for (auto *edge : tmp) gs->removeEdge(edge);
+        }
+    }
+
     _tempLine = new QGraphicsLineItem(QLineF(sceneCenter(), sceneCenter()));
     scene()->addItem(_tempLine);
     event->accept();
@@ -96,16 +121,11 @@ void PortItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     delete _tempLine;
     _tempLine = nullptr;
 
-    // нет цели — выходим
     if (!target)
         return;
 
-    // проверка направления и типа порта
-    if (target->getType() != getType() || target->getDirection() == getDirection())
-        return;
-
-    // создаем логическое соединение
-    Edge edge;
-    edge.setFrom(_port);
-    edge.setTo(target->port());
+    auto *graphItem = qobject_cast<GraphItem *>(scene());
+    if (graphItem) {
+        graphItem->createEdge(this, target);
+    }
 }
